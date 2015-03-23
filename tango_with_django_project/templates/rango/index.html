@@ -1,39 +1,42 @@
-<!DOCTYPE html>
+{% extends 'layout.html' %}
+
 {% load staticfiles %}
 
-<html>
-
-    <head>
-        <title>Rango</title>
-    </head>
-
-    <body>
-        <h1>Rango says Hello</h1>
+{% block body_block %}
+    <div class="page-header">
+        {% if user.is_authenticated %}
+        <h1>Rango says... hello {{ user.username }}!</h1>
+        {% else %}
+        <h1>Rango says... hello world!</h1>
+        {% endif %}
+    </div>
+     <div class="row placeholders">
+        <div class="col-xs-12 col-sm-6 placeholder">
+            <h4>Categories</h4>
 
         {% if categories %}
-            <ul>
+            <ul class="list-group">
                 {% for category in categories %}
-                    <li><a href="/rango/category/{{category.slug}}">{{ category.name }}</a></li>
+                    <li class="list-group-item"><a href="{% url 'category' category.slug %}">{{ category.name }}</a></li>
                 {% endfor %}
             </ul>
         {% else %}
             <strong>No hay datos</strong>
         {% endif %}
-
-        <h2>Most viewed pages</h2>
+        </div>
+        <div class="col-xs-12 col-sm-6 placeholder">
+          <h4>Pages</h4>
         {% if pages %}
-            <ol>
+            <ol class="list-group">
             {% for page in pages %}
-               <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+               <li class="list-group-item"><a href="{{ page.url }}">{{ page.title }}</a></li>
             {% endfor %}
             </ol>
         {% endif %}
-
-        <img src="{% static "images/rango.jpg" %}" alt="Rango" />
-        <br />
-        <a href="/rango/add_category/">Add a New Category</a><br />
-        <a href="/rango/about/">About</a><br />
-
-    </body>
-
-</html>
+        </div>
+        <div class="col-xs-12">
+         <img src="{% static "images/rango.jpg" %}" alt="Rango" />
+        </div>
+     </div>
+    <p> visits: {{ visits }}</p>
+{% endblock %}
