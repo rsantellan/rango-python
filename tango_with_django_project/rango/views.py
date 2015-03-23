@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from django.http import HttpResponse
 from rango.models import Category, Page
-from rango.forms import CategoryForm
+from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 
 def index(request):
 
@@ -53,7 +53,8 @@ def add_category(request):
 
             # Now call the index() view.
             # The user will be shown the homepage.
-            return index(request)
+            return redirect('/rango/')
+            #return index(request)
         else:
             # The supplied form contained errors - just print them to the terminal.
             print form.errors
@@ -65,5 +66,33 @@ def add_category(request):
     # Render the form with error messages (if any).
     return render(request, 'rango/add_category.html', {'form': form})
 
+def add_page(request, category_name_slug):
+    try:
+        cat = Category.objects.get(slug=category_name_slug)
+    except Category.DoesNotExist:
+        cat = None
+
+    if request.method == "POST":
+        form = PageForm(request.POST)
+
+        if form.is_valid():
+            if cat:
+                page = form.save(commit=False)
+                page.category = cat
+                page.views = 0
+                page.save()
+                return redirect('category', category_name_slug = category_name_slug)
+        else:
+            print form.errors
+    else:
+        form = PageForm()
+
+    context_dict = {'form' : form, 'category' : cat}
+    return render(request, 'rango/add_page.html', context_dict)
+
 def about(request):
     return HttpResponse("This is an about page. <br/> <a href='/rango/'>Index</a>")
+
+def register(request):
+    #Flag to know if it is registered
+    registered = False
